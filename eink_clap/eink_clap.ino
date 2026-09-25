@@ -6,8 +6,8 @@
 Seeed_GFX display(Seeed_Product::Seeed_ePaper_7INCH5);
 
 // Configuración del Access Point Wi-Fi
-const char *ssid = "ClapBoard_AP";
-const char *password = "123456789";
+const char *ssid = "NEBRALTA_Clap";
+const char *password = "123456789P";
 
 WebServer server(80);
 
