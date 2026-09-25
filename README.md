@@ -1,10 +1,15 @@
 # E-Slate Claqueta Digital (Film Clapperboard) 🎬📟
 
-Esto lo he creado 100% con IA
+Esto lo he creado 100% con IA basado en las contribuciones de By
+gokux en https://www.instructables.com/E-Slate-DIY-Wi-Fi-E-Ink-Digital-Film-Clapperboard/
 
-Claqueta de cine digital y portátil construida sobre tinta electrónica (**e-ink / e-Paper**), impulsada por el microcontrolador **Seeed Studio XIAO ESP32-S3 Plus** y la placa controladora **XIAO ePaper Display Board (EE04)** con la librería gráfica **[Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2)**.
 
-El dispositivo genera su propia red Wi-Fi y aloja un servidor web interno para que cualquier miembro del equipo de rodaje pueda actualizar remotamente los datos de la claqueta (ROLL, SCENE, TAKE, PROD, DIR, DOP, etc.) desde su teléfono móvil o tablet en tiempo real.
+
+Claqueta de cine digital y portátil construida sobre tinta electrónica (**e-ink / e-Paper**), usando **Seeed Studio XIAO ESP32-S3 Plus** y la placa controladora **XIAO ePaper Display Board (EE04)** con la librería gráfica **[Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2)**.
+
+El dispositivo genera su propia red Wi-Fi y aloja un servidor web interno para que durante rodaje pueda actualizar remotamente los datos de la claqueta (ROLL, SCENE, TAKE, PROD, DIR, DOP, etc.) desde su teléfono móvil o tablet en tiempo real.
+
+Tuve problemas intentando usar el platform IO en Antigravity IDE así que compilé y flashee la ESP32 desde Arduino.
 
 ---
 
