@@ -100,3 +100,9 @@ Si el puerto serie de la placa desaparece en tu Mac:
    ```bash
    ls -l /dev/cu.usb*
    ```
+
+---
+
+## 📄 Licencia
+
+Este proyecto es de código abierto y está disponible bajo los términos de la [Licencia MIT](LICENSE).
