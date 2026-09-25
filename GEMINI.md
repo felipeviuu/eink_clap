@@ -134,8 +134,8 @@ eink_clap/
 3. **Interfaz Web Responsiva y Valores Predeterminados**:
    - Tema oscuro cinematográfico accesible desde smartphone o tablet.
    - **PROD**: `NEBRALTA 🌸` (soporta emoji de flor de cerezo monocromático de 32x32)
-   - **DIR**: `JONATHAN LOPEZ`
-   - **DOP**: `FELIPE SALAS`
+   - **DIR**: `DIRECTOR`
+   - **DOP**: `FELIPELOTAS1`
    - **NOTE**: `ISO 120`
    - **DATE**: Sincronización automática desde el reloj del smartphone/tablet (con botón `📱 HOY` y opción manual)
    - **ROLL**: `A001` | **SCENE**: `35A` | **TAKE**: `1`

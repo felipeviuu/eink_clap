@@ -38,8 +38,8 @@ String roll = "A001";
 String scene = "35A";
 String take = "1";
 String prod = "NEBRALTA 🌸";
-String director = "JONATHAN LOPEZ";
-String dop = "FELIPE SALAS";
+String director = "DIRECTOR";
+String dop = "FELIPELOTAS1";
 String note = "ISO 120";
 String date = "25.09.2026";
 
