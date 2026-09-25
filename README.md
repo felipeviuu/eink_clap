@@ -1,139 +1,86 @@
-# eink_clap 📟✨
+# E-Slate Claqueta Digital (Film Clapperboard) 🎬📟
 
-Proyecto de desarrollo para pantalla de tinta electrónica (**e-ink / e-Paper**) basada en el microcontrolador **Seeed Studio XIAO ESP32-S3**, utilizando la librería gráfica moderna **[Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2)**.
+Claqueta de cine digital y portátil construida sobre tinta electrónica (**e-ink / e-Paper**), impulsada por el microcontrolador **Seeed Studio XIAO ESP32-S3 Plus** y la placa controladora **XIAO ePaper Display Board (EE04)** con la librería gráfica **[Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2)**.
 
-El objetivo a mediano plazo contempla la sincronización con un servidor **TRMNL Terminus** para desplegar dashboards y widgets informativos de bajo consumo.
+El dispositivo genera su propia red Wi-Fi y aloja un servidor web interno para que cualquier miembro del equipo de rodaje pueda actualizar remotamente los datos de la claqueta (ROLL, SCENE, TAKE, PROD, DIR, DOP, etc.) desde su teléfono móvil o tablet en tiempo real.
 
 ---
 
 ## 🛠️ Especificaciones de Hardware
 
-| Componente | Detalle |
+| Componente | Especificación Técnica |
 | :--- | :--- |
-| **Microcontrolador** | Seeed Studio XIAO ESP32-S3 |
-| **Arquitectura** | Xtensa Dual-Core 32-bit LX7 @ hasta 240 MHz |
-| **Memoria** | 8 MB Flash (Octal SPI) + 8 MB PSRAM (OPI) |
-| **Interfaz USB** | USB Nativo OTG / Serial JTAG en chip (GPIO19: D-, GPIO20: D+) |
-| **Pantalla** | Pantalla e-ink / e-Paper compatible con Seeed_GFX2 |
-| **Librería Gráfica** | [Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2) |
+| **Microcontrolador** | **Seeed Studio XIAO ESP32-S3 Plus** (Xtensa LX7 Dual-Core @ 240MHz) |
+| **Memoria** | 16 MB Flash (QIO) + 8 MB PSRAM OPI (`qio_opi`) |
+| **Carrier Board** | **XIAO ePaper Display Board - EE04** |
+| **Pantalla** | **7.5" Monochrome ePaper (800 x 480 px, UC8179)** |
+| **Librería Gráfica** | **Seeed_GFX2** (buffers nativos de 1 bpp) |
+| **Conectividad** | Wi-Fi 802.11 b/g/n (Modo SoftAP autónomo) + WebServer HTTP |
+| **Alimentación** | Batería LiPo 3.7V con conector JST 2.0mm o USB-C |
 
 ---
 
-## 📁 Estructura del Repositorio
+## 📁 Estructura del Proyecto
 
 ```text
 eink_clap/
-├── GEMINI.md               # Contexto, directivas del proyecto y reglas de desarrollo
-├── README.md               # Documentación general del proyecto (este archivo)
-└── eink_clap/
-    └── eink_clap.ino       # Sketch base de diagnóstico de hardware y verificación USB CDC
+├── .vscode/               # Configuración para Antigravity IDE
+├── eink_clap/
+│   └── eink_clap.ino      # Firmware de la claqueta (Seeed_GFX2 + SoftAP + WebServer)
+├── src -> eink_clap       # Enlace simbólico estándar para PlatformIO
+├── include/               # Archivos de inclusión C/C++
+├── lib/                   # Librerías locales
+├── platformio.ini         # Configuración y dependencias de compilación
+├── GEMINI.md              # Memoria, directivas y reglas para el agente de IA
+└── README.md              # Documentación general del repositorio
 ```
 
 ---
 
-## 🔌 Protocolo de Conexión USB y Bootloader (macOS)
+## 💻 Desarrollo y Compilación con PlatformIO
 
-El **ESP32-S3** utiliza un puerto USB nativo directo. Si el firmware cargado previamente desactiva el puerto CDC, o el microcontrolador entra en un bucle de reinicio (*kernel panic*), el puerto serie desaparecerá por completo del sistema operativo.
+Este proyecto está configurado para compilarse a máxima velocidad en **PlatformIO** dentro de **Antigravity IDE**:
 
-### Modo Bootloader Forzado (BROM)
-Para forzar al chip a exponer el puerto serie en macOS:
-
-1. Conecta el XIAO ESP32-S3 a la Mac mediante cable USB-C de datos.
-2. Mantén presionado el botón **BOOT** (etiquetado como **B** en la placa).
-3. Presiona y suelta el botón **RESET** (etiquetado como **R**).
-4. Suelta el botón **BOOT**.
-5. macOS detectará inmediatamente el dispositivo en modo ROM.
-
-### Verificación del Puerto Serie
-Abre la terminal en macOS y ejecuta:
-
-```bash
-# Listar puertos USB serie detectados
-ls -l /dev/cu.usb*
-```
-> El puerto usualmente aparecerá con un nombre similar a `/dev/cu.usbmodem1101` o `/dev/cu.usbmodem2101`.
-
-Para validar la comunicación con `esptool`:
-```bash
-esptool.py flash_id
-```
-
-### Checklist Físico y de Sistema
-- [ ] **Cable USB**: Asegúrate de usar un cable de transferencia de datos de 4 hilos (no un cable que solo cargue batería).
-- [ ] **Permisos de macOS**: Acepta el diálogo emergente *"¿Permitir que el accesorio se conecte a esta Mac?"* al enchufarlo.
-- [ ] **Hubs y Adaptadores**: Si usas un hub USB-C o adaptador multipuerto, prueba una conexión directa o un puerto con compatibilidad USB 2.0 en caso de fallos de enumeración.
+1. **Abrir el proyecto**:
+   - Si no aparece listado en PlatformIO Home, haz clic en la casita 🏠 → **Open Project** → selecciona la carpeta del repositorio.
+   - O recarga la ventana con `Cmd + Shift + P` → `Developer: Reload Window`.
+2. **Compilar**:
+   - Presiona el icono del **check (✔)** en la barra inferior o ejecuta en la terminal:
+     ```bash
+     pio run
+     ```
+3. **Subir a la placa**:
+   - Conecta la placa por USB y pulsa la **flecha (➜)** en la barra inferior o ejecuta:
+     ```bash
+     pio run -t upload
+     ```
+4. **Monitor Serie**:
+   - Pulsa el icono del enchufe (**🔌**) a 115200 baudios o ejecuta:
+     ```bash
+     pio device monitor
+     ```
 
 ---
 
-## ⚙️ Configuración del Entorno (Arduino IDE / CLI)
+## 📱 Uso en Rodaje
 
-### URL del Gestor de Tarjetas
-Añade la siguiente URL en **Arduino IDE > Preferences > Additional Boards Manager URLs**:
-```
-https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-```
-
-### Parámetros Críticos de la Placa (Menú *Herramientas / Tools*)
-
-| Parámetro | Valor Requerido | Por qué es crítico |
-| :--- | :--- | :--- |
-| **Board** | `XIAO_ESP32S3` | Configuración oficial de pines y frecuencias para XIAO |
-| **USB CDC On Boot** | **Enabled** | **IMPRESCINDIBLE**: Si está deshabilitado, `Serial` no funcionará y el puerto USB no responderá |
-| **Flash Size** | `8MB (64Mb)` | Capacidad física de memoria Flash del módulo |
-| **PSRAM** | `OPI PSRAM` | Habilita los 8 MB de memoria RAM externa de alta velocidad |
-| **Upload Mode** | `UART0 / Hardware CDC` | Flasheo directo sobre el controlador nativo de la ROM |
-| **USB DFU On Boot** | `Disabled` | Mantener apagado |
+1. Al encender la claqueta, la pantalla mostrará las instrucciones de conexión durante unos segundos:
+   - **Red Wi-Fi**: `ClapBoard_AP`
+   - **Contraseña**: `123456789`
+   - **Dirección Web**: `http://192.168.4.1`
+2. Conéctate a la red Wi-Fi desde tu móvil o tablet.
+3. Abre el navegador web en `http://192.168.4.1`.
+4. Edita los campos deseados y pulsa **"Actualizar Claqueta"**. La pantalla e-Paper se actualizará automáticamente con la nueva información.
 
 ---
 
-## 🎨 Librería Gráfica Seeed_GFX2
+## 🔌 Solución de Problemas: Detección USB (macOS)
 
-El proyecto emplea la librería [Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2) debido a su arquitectura modular orientada a pantallas modernas:
-
-$$\text{Board} \longrightarrow \text{Bus} \longrightarrow \text{Driver} \longrightarrow \text{Panel}$$
-
-### ⚠️ Regla Estricta: Conflicto con `TFT_eSPI`
-`Seeed_GFX2` entra en conflicto directo de nombres y símbolos si `TFT_eSPI` se encuentra instalada en el directorio de librerías de Arduino (`~/Documents/Arduino/libraries/TFT_eSPI`).
-* **Acción requerida**: Desinstala o renombra la carpeta de `TFT_eSPI` antes de compilar cualquier sketch con `Seeed_GFX2`.
-
----
-
-## 🚀 Primeros Pasos: Flasheo del Sketch Base
-
-El sketch [eink_clap.ino](file:///Users/felipesalas/Development/eink_clap/eink_clap/eink_clap.ino) valida el funcionamiento del hardware, el LED integrado y la salida de telemetría por USB CDC.
-
-1. Abre el archivo `eink_clap/eink_clap.ino` en Arduino IDE.
-2. Selecciona la placa **XIAO_ESP32S3** y el puerto `/dev/cu.usbmodem*`.
-3. Verifica que **USB CDC On Boot** esté en **Enabled**.
-4. Haz clic en **Upload / Subir**.
-5. Abre el **Serial Monitor** configurado a **115200 baudios**.
-
-### Salida esperada en Monitor Serie:
-```text
-====================================
-  ESP32-S3 ONLINE - Puerto CDC OK   
-====================================
-Chip Model: ESP32-S3 (Rev 0)
-Cores: 2, CPU Freq: 240 MHz
-Flash Size: 8 MB
-PSRAM Size: 8 MB
-Listo para pruebas con Seeed_GFX2.
-
-[Heartbeat #0] ESP32-S3 ejecutando normalmente.
-[Heartbeat #1] ESP32-S3 ejecutando normalmente.
-```
-
----
-
-## 🗺️ Hoja de Ruta (Roadmap)
-
-- [x] **Fase 1: Reconocimiento de Hardware y CDC**: Creación del entorno base, verificación de bootloader y telemetría por USB nativo.
-- [ ] **Fase 2: Integración de Seeed_GFX2**: Instalación de la librería y configuración del bus SPI/I80 según la pantalla seleccionada.
-- [ ] **Fase 3: Pruebas de Renderizado e-Paper**: Inicialización del panel e-ink, refresco parcial/completo, renderizado de primitivas gráficas y tipografías.
-- [ ] **Fase 4: Conectividad y TRMNL Terminus**: Implementación de cliente HTTP/WiFi para sincronización de imágenes y widgets generados por backend TRMNL Terminus.
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo licencia [MIT](LICENSE) (o la que se designe para el repositorio).
+Si el puerto serie de la placa desaparece en tu Mac:
+1. Mantén presionado el botón **`BOOT`** (marcado como `B`).
+2. Presiona y suelta una vez el botón **`RESET`** (marcado como `R`).
+3. Suelta el botón **`BOOT`**.
+4. Verifica en la terminal con:
+   ```bash
+   ls -l /dev/cu.usb*
+   ```

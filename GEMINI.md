@@ -1,90 +1,150 @@
-# Project Context & Agent Rules: ESP32-S3 + Seeed_GFX2
+# Project Context & Agent Memory: E-Slate Claqueta Digital (XIAO ESP32-S3 Plus + Seeed_GFX2)
 
 ## 🎯 Directiva Actual del Proyecto
-> **ESTADO PRIORITARIO**: Se pospone temporalmente la integración con el backend TRMNL Terminus (Docker, PostgreSQL, Cloudflare Tunnel). 
-> **OBJETIVO INMEDIATO**: Reconocimiento de hardware, puesta en modo Bootloader, configuración de entorno y flasheo exitoso del **ESP32-S3** (Seeed Studio XIAO ESP32S3) con la librería gráfica **Seeed_GFX2**.
+> **ESTADO**: Se pospone de forma indefinida la integración con el backend TRMNL Terminus (Docker, PostgreSQL, Cloudflare Tunnel).
+> **OBJETIVO ACTIVO**: Desarrollo y operación autónoma del dispositivo **E-Slate (Digital Film Clapperboard)** utilizando:
+> 1. Placa **Seeed Studio XIAO ESP32-S3 Plus** (16MB Flash, 8MB PSRAM OPI).
+> 2. Placa base de conexión **XIAO ePaper Display Board (EE04)**.
+> 3. Pantalla **7.5" Monochrome ePaper (800x480, UC8179)**.
+> 4. Librería gráfica moderna **Seeed_GFX2**.
+> 5. Servidor Web integrado + Punto de acceso Wi-Fi local autónomo (**`ClapBoard_AP`**).
+> 6. Entorno de desarrollo primario: **PlatformIO en Antigravity IDE**.
 
 ---
 
 ## 🛠️ Especificaciones de Hardware
 
-- **Microcontrolador**: **Seeed Studio XIAO ESP32-S3 Plus** (Xtensa Dual-Core LX7, hasta 240MHz, **16MB Flash**, **8MB PSRAM OPI**, 20 GPIOs).
-- **Identificador PlatformIO**: `seeed_xiao_esp32s3` con configuración de 16MB Flash y `qio_opi`.
-- **Interfaz USB**: USB Nativo OTG / Serial JTAG integrado en el chip (GPIO19 = D-, GPIO20 = D+).
-- **Pantalla**: Pantalla e-ink / e-Paper o LCD compatible con Seeed_GFX2.
-- **Librería Gráfica**: [Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2).
+| Componente | Especificación Técnica |
+| :--- | :--- |
+| **Microcontrolador** | **Seeed Studio XIAO ESP32-S3 Plus** (Xtensa LX7 Dual-Core @ 240MHz) |
+| **Memoria Flash** | **16 MB** Quad-SPI (QIO) |
+| **Memoria PSRAM** | **8 MB** Octal-SPI (OPI PSRAM) - Modo `qio_opi` |
+| **Carrier Board** | **XIAO ePaper Display Board - EE04** (conector FPC 24 pines y 50 pines) |
+| **Display e-Paper** | **7.5 pulgadas Monocromático (800 x 480 píxeles, controlador UC8179)** |
+| **Buffer de Render** | 1 bpp empaquetado (optimizado para bajo consumo de RAM/PSRAM) |
+| **Interfaz USB** | USB Nativo OTG / Serial JTAG (GPIO19 = D-, GPIO20 = D+) |
+| **Pulsadores EE04** | KEY0 (GPIO2), KEY1 (GPIO3), KEY2 (GPIO5) - Activos en bajo |
+| **Batería / ADC** | Voltaje en A0 (GPIO1), habilitador ADC en A5 (GPIO6) |
+
+---
+
+## 💻 Entorno de Desarrollo: PlatformIO en Antigravity IDE
+
+El proyecto está optimizado para **PlatformIO** dentro de Antigravity IDE (VS Code) para compilación paralela de alta velocidad.
+
+### 1. Archivo `platformio.ini`
+```ini
+[platformio]
+src_dir = eink_clap
+
+[env:seeed_xiao_esp32s3_plus]
+platform = espressif32
+board = seeed_xiao_esp32s3
+framework = arduino
+
+; Configuración de memoria para el modelo PLUS (16MB Flash / 8MB OPI PSRAM)
+board_upload.flash_size = 16MB
+board_build.partitions = default_16MB.csv
+board_build.arduino.memory_type = qio_opi
+
+; Flags obligatorios para USB CDC nativo y PSRAM
+build_flags = 
+    -D ARDUINO_USB_MODE=1
+    -D ARDUINO_USB_CDC_ON_BOOT=1
+    -D BOARD_HAS_PSRAM
+
+; Descarga automática de la librería Seeed_GFX2 desde GitHub
+lib_deps = 
+    https://github.com/Seeed-Studio/Seeed_GFX2.git
+
+monitor_speed = 115200
+```
+
+### 2. Estructura de Directorios del Proyecto
+```text
+eink_clap/
+├── .vscode/               # Configuración de extensiones de Antigravity IDE
+├── eink_clap/
+│   └── eink_clap.ino      # Firmware principal de la claqueta (Seeed_GFX2 + SoftAP + WebServer)
+├── src -> eink_clap       # Enlace simbólico estándar para PlatformIO
+├── include/               # Cabeceras adicionales C/C++
+├── lib/                   # Librerías locales privadas
+├── platformio.ini         # Configuración del entorno de compilación
+├── GEMINI.md              # Memoria, directivas y reglas del agente (este archivo)
+└── README.md              # Documentación general del repositorio
+```
+
+### 3. Comandos Útiles de PlatformIO
+- **Compilar**: `pio run` (o icono ✔️ en la barra inferior)
+- **Flashear**: `pio run -t upload` (o icono ➡️ en la barra inferior)
+- **Monitor Serie**: `pio device monitor` (o icono 🔌 a 115200 baudios)
+- **Abrir en PlatformIO Home**: Si no aparece en la lista visual, pulsar casita 🏠 → *Open Project* → seleccionar carpeta `/Users/felipesalas/Development/eink_clap`.
+
+---
+
+## 🎨 Reglas Obligatorias de `Seeed_GFX2`
+
+1. **PROHIBIDO usar `TFT_eSPI`**:
+   - `Seeed_GFX2` entra en conflicto directo de símbolos con `TFT_eSPI`.
+   - No usar `#define EPAPER_ENABLE` ni instanciar `EPaper epaper;` (eso pertenecía al fork obsoleto).
+2. **Inclusión e Instanciación Oficial**:
+   ```cpp
+   #include <Seeed_GFX.h>
+   Seeed_GFX display(Seeed_Product::Seeed_ePaper_7INCH5);
+   ```
+3. **Inicialización y Refresco**:
+   - Iniciar siempre validando hardware:
+     ```cpp
+     if (!display.begin()) {
+       Serial.printf("Error: %s\n", display.lastResult().message);
+     }
+     ```
+   - Para actualizar el panel físico: `const GfxResult res = display.refresh();`
+4. **Respuesta Web Ágil**:
+   - En peticiones POST de actualización (`/update`), el servidor HTTP debe enviar de inmediato `303 See Other` al navegador **antes** o en paralelo al `display.refresh()`, evitando que el navegador móvil quede en estado de espera mientras el e-paper refresca físicamente.
 
 ---
 
 ## 🔌 Protocolo de Conexión USB y Bootloader en macOS
 
-### 1. El Problema Común del ESP32-S3
-El ESP32-S3 utiliza USB nativo directo. Si el chip tiene cargado un firmware que desactiva el puerto CDC, o entra en un loop de pánico (`kernel panic`), el puerto USB desaparece por completo del sistema operativo.
-
-### 2. Procedimiento para Forzar Modo Bootloader (BROM)
-Para que el ESP32-S3 sea detectado forzosamente por macOS:
-1. Conectar el ESP32-S3 por USB al Mac.
-2. Mantener presionado el botón **BOOT** (o botón **B**).
-3. Presionar y soltar el botón **RESET** (o botón **R**) mientras se mantiene presionado BOOT.
-4. Soltar el botón **BOOT**.
-5. *Resultado esperado*: El chip entra en la ROM de arranque interna y macOS expone el puerto serie inmediatamente.
-
-### 3. Verificación en macOS
-Ejecutar en la terminal del Mac:
-```bash
-# Listar puertos serie USB detectados:
-ls -l /dev/cu.usb*
-
-# Verificar comunicación directa con el chip usando esptool:
-esptool.py chip_id
-# o
-esptool.py flash_id
-```
-*Nombre habitual del puerto en macOS*: `/dev/cu.usbmodem*` (ej. `/dev/cu.usbmodem1101` o `/dev/cu.usbmodem2101`).
-
-### 4. Checklist Físico y de Sistema
-- [ ] **Cable USB**: Asegurarse de usar un cable de transferencia de datos de 4 hilos (no un cable solo de carga).
-- [ ] **Permisos de macOS**: Aceptar el diálogo del sistema *"¿Permitir que el accesorio se conecte a esta Mac?"* al enchufarlo.
-- [ ] **Hubs USB-C**: Si se usa adaptador, probar conexión directa o puerto con soporte USB 2.0.
+### Detección de Placa
+- Si macOS no lista el puerto o la placa se reinicia en bucle:
+  1. Conectar cable USB-C con soporte de datos al Mac.
+  2. Mantener presionado botón **BOOT** (`B`).
+  3. Presionar y soltar botón **RESET** (`R`).
+  4. Soltar botón **BOOT** (`B`).
+  5. macOS expondrá el puerto de inmediato como `/dev/cu.usbmodem*`.
+- Verificar en Terminal:
+  ```bash
+  ls -l /dev/cu.usb*
+  esptool.py flash_id
+  ```
 
 ---
 
-## ⚙️ Configuración del Entorno de Desarrollo (Arduino IDE / CLI)
+## 🎬 Funcionalidad del Firmware (`eink_clap.ino`)
 
-### Parámetros Críticos de la Placa (Tools / Herramientas):
-| Parámetro | Valor Requerido | Explicación |
-| :--- | :--- | :--- |
-| **Board** | `XIAO_ESP32S3` | Paquete oficial de Espressif / Seeed |
-| **USB CDC On Boot** | **Enabled** | **CRÍTICO**: Sin esto, `Serial.print()` no funciona por USB nativo y el puerto se desconecta al arrancar |
-| **Flash Size** | `8MB (64Mb)` | Capacidad estándar de XIAO ESP32S3 |
-| **PSRAM** | `OPI PSRAM` | Para disponer de los 8MB de memoria PSRAM |
-| **Upload Mode** | `UART0 / Hardware CDC` | Flasheo directo sobre el controlador nativo |
-| **USB DFU On Boot** | `Disabled` | Mantener apagado |
-
-### URL del Gestor de Tarjetas (Arduino Preferences):
-```
-https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-```
+1. **Punto de Acceso Wi-Fi Local**:
+   - SSID: `ClapBoard_AP`
+   - Password: `123456789`
+   - IP estática del dispositivo: `192.168.4.1`
+2. **Pantalla de Bienvenida (`showIPOnBoot`)**:
+   - Al arrancar, dibuja un marco con el nombre de la red y la URL a visitar.
+3. **Interfaz Web Responsiva**:
+   - Tema oscuro cinematográfico accesible desde smartphone o tablet.
+   - Campos configurables: **ROLL**, **SCENE**, **TAKE**, **PROD**, **DIR**, **DOP**, **NOTE**, **DATE**.
+4. **Grilla de Claqueta en Panel 800x480**:
+   - Dibuja divisiones precisas de claqueta tradicional.
+   - Tipografía grande de alto contraste legible a varios metros de distancia en set.
 
 ---
 
-## 🎨 Reglas de Seeed_GFX2
+## 📋 Estado y Próximos Pasos
 
-1. **Eliminar TFT_eSPI**:
-   - `Seeed_GFX2` entra en conflicto directo de nombres y símbolos si `TFT_eSPI` está instalada en `~/Documents/Arduino/libraries/`.
-   - **Regla estricta**: Desinstalar o renombrar la carpeta de `TFT_eSPI` antes de compilar.
-2. **Instalación de Seeed_GFX2**:
-   - Descargar el archivo ZIP desde [Seeed-Studio/Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2) o clonar el repositorio dentro de `libraries/`.
-3. **Arquitectura Modular**:
-   - Utilizar el esquema: `Board` → `Bus` → `Driver` → `Panel`.
-   - No requiere editar archivos globales tipo `User_Setup.h`.
-
----
-
-## 📋 Hoja de Ruta Inmediata
-
-- [x] **Paso 0**: Configurar directivas del repositorio (`GEMINI.md`).
-- [ ] **Paso 1**: Obtener detección del puerto `/dev/cu.usbmodem*` en macOS mediante combinación Bootloader.
-- [ ] **Paso 2**: Flashear sketch de prueba básico (`blink_cdc.ino`) para validar que la cadena de herramientas y el puerto CDC funcionan correctamente.
-- [ ] **Paso 3**: Instalar y validar la librería `Seeed_GFX2`.
-- [ ] **Paso 4**: Configurar el bus y driver específicos de la pantalla conectada y renderizar gráficos locales de prueba.
+- [x] Contexto y directivas configuradas en `GEMINI.md`.
+- [x] Configuración de `platformio.ini` para XIAO ESP32-S3 Plus (16MB/8MB OPI PSRAM).
+- [x] Código de la claqueta migrado 100% a `Seeed_GFX2` en `eink_clap.ino`.
+- [x] Soporte para reconocimiento automático de proyecto en Antigravity IDE.
+- [ ] Flasheo físico inicial en la placa desde Antigravity IDE.
+- [ ] Validación visual de las fuentes y el centrado en el panel e-paper de 7.5".
+- [ ] (Opcional futuro) Integración de botones físicos KEY0/KEY1/KEY2 de la placa EE04 para incrementar tomas (+1 TAKE) directamente en la claqueta.
