@@ -105,4 +105,4 @@ Si el puerto serie de la placa desaparece en tu Mac:
 
 ## 📄 Licencia
 
-Este proyecto es de código abierto y está disponible bajo los términos de la [Licencia MIT](LICENSE).
+Este proyecto es de código abierto y está disponible bajo los términos de la [GNU General Public License v3.0 (GPLv3)](LICENSE).
