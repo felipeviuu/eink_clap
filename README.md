@@ -65,12 +65,28 @@ Este proyecto está configurado para compilarse a máxima velocidad en **Platfor
 ## 📱 Uso en Rodaje
 
 1. Al encender la claqueta, la pantalla mostrará las instrucciones de conexión durante unos segundos:
-   - **Red Wi-Fi**: `ClapBoard_AP`
-   - **Contraseña**: `123456789`
-   - **Dirección Web**: `http://192.168.4.1`
-2. Conéctate a la red Wi-Fi desde tu móvil o tablet.
-3. Abre el navegador web en `http://192.168.4.1`.
-4. Edita los campos deseados y pulsa **"Actualizar Claqueta"**. La pantalla e-Paper se actualizará automáticamente con la nueva información.
+   - **Red Wi-Fi**: `NEBRALTA_Clap`
+   - **Contraseña**: `123456789P`
+   - **Dirección Web**: `http://clap.local` (o `http://192.168.4.1`)
+2. Conéctate a la red Wi-Fi desde tu smartphone, tablet o portátil.
+3. Abre tu navegador web y entra a **`http://clap.local`**.
+4. **Sincronización de fecha**: El sistema lee automáticamente la fecha del reloj de tu dispositivo móvil y la transfiere al e-Paper al guardar.
+5. **Botones físicos en la claqueta**:
+   - **`KEY1`**: Suma **+1 TAKE** tras cada toma ("¡Corten!").
+   - **`KEY3`**: Suma **+1 ROLL** al cambiar de tarjeta o rollo.
+
+---
+
+## ⚙️ Configuración para Arduino IDE
+
+Si compilas desde **Arduino IDE**:
+- **Placa**: `XIAO_ESP32S3` (o `ESP32S3 Dev Module`)
+- **USB CDC On Boot**: `Enabled`
+- **CPU Frequency**: `240MHz (WiFi)`
+- **Flash Size**: `16MB (128Mb)`
+- **Partition Scheme**: `16M Flash (3MB APP/9.9MB FATFS)` o `default 16MB`
+- **PSRAM**: `OPI PSRAM`
+- **Librería requerida**: Instalar o clonar [Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2) en tu carpeta `Arduino/libraries`.
 
 ---
 

@@ -7,7 +7,7 @@
 > 2. Placa base de conexión **XIAO ePaper Display Board (EE04)**.
 > 3. Pantalla **7.5" Monochrome ePaper (800x480, UC8179)**.
 > 4. Librería gráfica moderna **Seeed_GFX2**.
-> 5. Servidor Web integrado + Punto de acceso Wi-Fi local autónomo (**`ClapBoard_AP`**).
+> 5. Servidor Web integrado + Punto de acceso Wi-Fi local autónomo (**`NEBRALTA_Clap`** / pass **`123456789P`**).
 > 6. Entorno de desarrollo primario: **PlatformIO en Antigravity IDE**.
 
 ---
@@ -125,17 +125,31 @@ eink_clap/
 ## 🎬 Funcionalidad del Firmware (`eink_clap.ino`)
 
 1. **Punto de Acceso Wi-Fi Local**:
-   - SSID: `ClapBoard_AP`
-   - Password: `123456789`
+   - SSID: `NEBRALTA_Clap`
+   - Password: `123456789P`
    - IP estática del dispositivo: `192.168.4.1`
+   - Dominio mDNS: `http://clap.local`
 2. **Pantalla de Bienvenida (`showIPOnBoot`)**:
    - Al arrancar, dibuja un marco con el nombre de la red y la URL a visitar.
-3. **Interfaz Web Responsiva**:
+3. **Interfaz Web Responsiva y Valores Predeterminados**:
    - Tema oscuro cinematográfico accesible desde smartphone o tablet.
-   - Campos configurables: **ROLL**, **SCENE**, **TAKE**, **PROD**, **DIR**, **DOP**, **NOTE**, **DATE**.
+   - **PROD**: `NEBRALTA 🌸` (soporta emoji de flor de cerezo monocromático de 32x32)
+   - **DIR**: `JONATHAN LOPEZ`
+   - **DOP**: `FELIPE SALAS`
+   - **NOTE**: `ISO 120`
+   - **DATE**: Sincronización automática desde el reloj del smartphone/tablet (con botón `📱 HOY` y opción manual)
+   - **ROLL**: `A001` | **SCENE**: `35A` | **TAKE**: `1`
+   - **CAM**: `A` | **SOUND**: `SYNC` / `MOS` | **LOC**: `INT` / `EXT` | **LIGHT**: `DAY` / `NIGHT`.
+   - **Sin Timecode**: Eliminado por completo para un diseño limpio, espacioso y legible a gran distancia.
 4. **Grilla de Claqueta en Panel 800x480**:
    - Dibuja divisiones precisas de claqueta tradicional.
-   - Tipografía grande de alto contraste legible a varios metros de distancia en set.
+   - Ajuste inteligente automático (`drawTextAuto`):
+     - Prioriza **UNA SOLA LÍNEA** más grande (probando tamaños decrecientes).
+     - Evita saltos de línea innecesarios en títulos como `"FLOR Y CONVENTO"`, renderizándolo en tamaño 7 (56px) o tamaño 6 (48px con flor).
+     - Centrado vertical dinámico dentro de cada franja.
+   - **Mayúsculas sostenidas**: Todos los textos se transforman y renderizan obligatoriamente en MAYÚSCULAS (ALL CAPS).
+   - Badges visuales de alto contraste (`drawBadge`): fondo negro y texto blanco para el estado activo (`SYNC`, `INT`, `DAY`).
+   - Botones físicos EE04: Key1 (GPIO3/2) suma +1 TAKE, Key3 (GPIO5) suma +1 ROLL con cooldown anti-rebote de 1.5s.
 
 ---
 
@@ -144,7 +158,11 @@ eink_clap/
 - [x] Contexto y directivas configuradas en `GEMINI.md`.
 - [x] Configuración de `platformio.ini` para XIAO ESP32-S3 Plus (16MB/8MB OPI PSRAM).
 - [x] Código de la claqueta migrado 100% a `Seeed_GFX2` en `eink_clap.ino`.
-- [x] Soporte para reconocimiento automático de proyecto en Antigravity IDE.
-- [ ] Flasheo físico inicial en la placa desde Antigravity IDE.
-- [ ] Validación visual de las fuentes y el centrado en el panel e-paper de 7.5".
-- [ ] (Opcional futuro) Integración de botones físicos KEY0/KEY1/KEY2 de la placa EE04 para incrementar tomas (+1 TAKE) directamente en la claqueta.
+- [x] Soporte mDNS (`http://clap.local`), ajuste inteligente a una/dos líneas y mayúsculas sostenidas forzadas.
+- [x] Soporte para el emoji `🌸` mediante bitmap monocromático embebido en PROGMEM.
+- [x] Sincronización automática de fecha desde el navegador del dispositivo móvil.
+- [x] Integración de botones físicos KEY1 (+1 TAKE) y KEY3 (+1 ROLL) con cooldown anti-rebote.
+- [x] Edición Cinema Pro con CAM, SYNC/MOS, INT/EXT y DAY/NIGHT (Timecode retirado).
+- [x] Optimización de `drawTextAuto` para priorizar una sola línea grande ("FLOR Y CONVENTO").
+- [ ] Flasheo físico en la placa desde Arduino IDE / PlatformIO.
+- [ ] Validación visual final en el panel e-paper de 7.5".
