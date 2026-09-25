@@ -8,7 +8,8 @@
 
 ## 🛠️ Especificaciones de Hardware
 
-- **Microcontrolador**: Seeed Studio XIAO ESP32-S3 (Xtensa Dual-Core LX7, hasta 240MHz, 8MB Flash, 8MB PSRAM OPI).
+- **Microcontrolador**: **Seeed Studio XIAO ESP32-S3 Plus** (Xtensa Dual-Core LX7, hasta 240MHz, **16MB Flash**, **8MB PSRAM OPI**, 20 GPIOs).
+- **Identificador PlatformIO**: `seeed_xiao_esp32s3` con configuración de 16MB Flash y `qio_opi`.
 - **Interfaz USB**: USB Nativo OTG / Serial JTAG integrado en el chip (GPIO19 = D-, GPIO20 = D+).
 - **Pantalla**: Pantalla e-ink / e-Paper o LCD compatible con Seeed_GFX2.
 - **Librería Gráfica**: [Seeed_GFX2](https://github.com/Seeed-Studio/Seeed_GFX2).
