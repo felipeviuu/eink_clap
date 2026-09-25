@@ -1,0 +1,24 @@
+# Archivos temporales y de sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Arduino
+*.hex
+*.bin
+*.elf
+
+# VS Code / Entornos locales privados
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.local
